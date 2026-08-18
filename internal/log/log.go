@@ -208,8 +208,7 @@ func (l *Log) CommitIndex() uint64 { return l.commitIndex }
 func (l *Log) CommitTo(index uint64) error {
 	lastIdx, _ := l.Last()
 	if index > lastIdx {
-		l.commitIndex = lastIdx
-		return nil
+		return fmt.Errorf("log: cannot commit index %d (last index %d)", index, lastIdx)
 	}
 	if index < l.commitIndex {
 		return ErrCommitRegression

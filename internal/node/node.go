@@ -432,7 +432,11 @@ func (n *Node) handleAppendEntries(m Message) []Message {
 
 	lastIdx, _ := n.raftLog.Last()
 	if m.LeaderCommit > n.raftLog.CommitIndex() {
-		if err := n.raftLog.CommitTo(m.LeaderCommit); err == nil && m.LeaderCommit > 0 {
+		newCommit := m.LeaderCommit
+		if newCommit > lastIdx {
+			newCommit = lastIdx
+		}
+		if err := n.raftLog.CommitTo(newCommit); err == nil && newCommit > 0 {
 			n.addEvent("node %d committed index %d (term %d)", n.id, n.raftLog.CommitIndex(), n.currentTerm)
 		}
 	}
